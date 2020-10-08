@@ -4,6 +4,8 @@
 #include <ESP8266WebServer.h>
 #include <EEPROM.h>
 
+int PIN = 15;   // Change here for global changes
+
 const char *ssid = "Smart LED";
 const char *password = "A@*#0000";
 
@@ -20,11 +22,11 @@ void setup(void){
 ///////EEPROM////////
    
   EEPROM.begin(512);
-  digitalWrite(15,EEPROM.read(0));
+  digitalWrite(PIN,EEPROM.read(0));
   
 ///////EEPROM////////
 
-  pinMode(15, OUTPUT);
+  pinMode(PIN, OUTPUT); 
 
 //Remove the password parameter if you want the AP to be open
   WiFi.softAP(ssid, password);
@@ -51,7 +53,7 @@ void handleRoot() {
  
 // When URI / is requested, send a web page with a button to toggle the LED
 
- if(digitalRead(15))
+ if(digitalRead(PIN))
  {
   server.send(200, "text/html", "<form action=\"/LED\" method=\"POST\"><center><h1 style=\"font-size:75px; margin:340px 0 0 0;\">Smart Bulb</h1><button type=\"submit\" style=\"width:750px; height:300px; background-color:#1BE7FA; margin:400px 0 0 0; border-radius:20px;\"><h1 style=\"font-size:65px;\">Turn OFF</h1></button></center></form>");  
  }
@@ -64,7 +66,7 @@ else{
 void handleLED() { //If a POST request is made to URI /LED
 
 // Change the state of the LED
-  digitalWrite(15,!digitalRead(15));      
+  digitalWrite(PIN,!digitalRead(PIN));      
 
 // Add a header to respond with a new location for the browser to go to the home page again
   server.sendHeader("Location","/");        
@@ -74,9 +76,9 @@ void handleLED() { //If a POST request is made to URI /LED
 
 //////////EEPROM///////////
   
-  if(EEPROM.read(0)!=digitalRead(15))
+  if(EEPROM.read(0)!=digitalRead(PIN))
   {
-     EEPROM.write(0,digitalRead(15));
+     EEPROM.write(0,digitalRead(PIN));
   }
   EEPROM.commit();
   
@@ -86,5 +88,5 @@ void handleLED() { //If a POST request is made to URI /LED
 
 void handleNotFound(){
 // Send HTTP status 404 (Not Found) when there's no handler for the URI in the request
-  server.send(404, "text/html", "<h1 align=\"center\">You want chickens but only eggs are here!<\h1>"); 
+  server.send(404, "text/html", "<h1 align=\"center\">You want chickens but only eggs are here!<\h1>");
 }
